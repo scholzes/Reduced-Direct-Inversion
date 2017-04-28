@@ -31,8 +31,16 @@ for(k=1:1:length(EC))
         f_R = F*FC;
         
         M = G(:,L)' * F(:,L);
-        C = (eye(length(L)) - M) \ eye(length(L));
-        g = f_R + F(:,L) * (C * (G(:,L)' * f_R));
+        Mnorm = norm(M);
+        NumIter = log(tolerance*(1-Mnorm))/log(Mnorm);
+        C_m = eye(length(L));
+
+        for(j = 1:1:NumIter)
+        C_m = eye(length(L)) + M*C_m;
+        end
+
+        g = f_R + F(:,L) * (C_m * (G(:,L)' * f_R));
+
         
         Data(t,k) = norm(f-g);
         Data2(t,k) = norm(f-f_R);

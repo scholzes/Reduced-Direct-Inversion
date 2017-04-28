@@ -4,7 +4,9 @@
 % n = Dimension
 % N = Length of the Frame
 % L = The Erasure Set
+% tolerance = tolerance allowed in $\| C - C_m \|$
 
+tolerance = 10^(-12);
 n = 250;
 N = 1000;
 L = [1:100];
@@ -44,11 +46,16 @@ f_R = F * FC;
 % matrix.
 
 M = G(:,L)' * F(:,L);
-C = (eye(length(L)) - M) \ eye(length(L));
 
-% We compute the reconstruction.
+Mnorm = norm(M);
+NumIter = round(log(tolerance*(1-Mnorm))/log(Mnorm));
+C_m = eye(length(L));
+for(j = 1:1:NumIter)
+    C_m = eye(length(L)) + M*C_m;
+end
 
-g = f_R + F(:,L) * (C * (G(:,L)' * f_R));
+% We compute the reconstruction
+g = f_R + F(:,L) * (C_m * (G(:,L)' * f_R));
 
 % We compute the \ell^2 norm of the error in the
 % reconstruction.
